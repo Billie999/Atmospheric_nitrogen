@@ -8,7 +8,6 @@ library(gridExtra)
 library(lubridate)
 library(viridis)
 library(Plotly)
-RStudio.Version()
 
 
 # TITLE: "Atmospheric Nitrogen Deposition in Rural Areas of Western Region of USA"
@@ -17,7 +16,7 @@ getwd() # getting working directory
 
 Field_Gas_Data <- read.table("path", header = TRUE, sep = ",", quote = "\"'", dec = ".",
                      fill = TRUE, comment.char = "", na.strings =  "?") # reads a file in table format and creates data frame 
-#from it named “Field_Gas_Data”
+
 View(Field_Gas_Data) # check the data is loaded correctly 
 dim(Field_Gas_Data) # check dimensions of the data frame
 length(Field_Gas_Data) # number of columns/length in a data frame
@@ -169,18 +168,19 @@ dim(Field_Gas_Data_Filtered) # check the dimesnions after filtration of data fra
 # Checking that the missing value have been filtered
 Rows <- unique(unlist(lapply(Field_Gas_Data_Filtered, function(Field_Gas_Data_Filtered) which(is.na(Field_Gas_Data_Filtered))))) # number of
 print(Rows)
-#missing values in Field_Gas_Data_Filtered
+
+# Missing values in Field_Gas_Data_Filtered
 sum(is.na(Field_Gas_Data_Filtered))
 Columns <- sapply(Field_Gas_Data_Filtered, function(Field_Gas_Data_Filtered) sum(is.na(Field_Gas_Data_Filtered))) # number of missing values by
 # column with Field_Gas_Data_Filtered after removal of NA’s values. The sapply () function output confirms
 # that the missing values are removed from the dataset.
 print(Columns)
+
 sapply(Field_Gas_Data_Filtered, class)
 print(Field_Gas_Data_Filtered$SITE_ID)
 levels(Field_Gas_Data_Filtered$SITE_ID)
-View(Field_Gas_Data_Filtered)
 
-# Side-by-side QQplots and box plots
+# Side-by-side Q-Qplots and box plots
 require(gridExtra)
 plot1 <- ggqqplot(Field_Gas_Data, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC") 
 plot2 <- ggqqplot(Field_Gas_Data_Filtered, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC") 
