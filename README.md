@@ -1,2 +1,2 @@
 # Atmospheric_nitrogen
-Exploratory data analysis and data visualisation of data originally from CASTNET web site.
+Data pre-processing (representation, wrangling, tidying) and exploratory data visualisation data analysis and data visualisation of data originally from CASTNET web site. The investigation included data representation, type conversion, data cleaning, group-base data summarization, variable selection, transformation and exploratory analysis using ggplot2.
