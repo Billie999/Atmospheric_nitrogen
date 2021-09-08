@@ -11,11 +11,11 @@ library(Plotly)
 RStudio.Version()
 
 
-# CAPSTONE PROJECT: FOUNDATIONS OF DATA SCIENCE 2019
 # TITLE: "Atmospheric Nitrogen Deposition in Rural Areas of Western Region of USA"
+
 getwd() # getting working directory
 
-Field_Gas_Data <- read.table("/Users/Biljana/Field_Gas_Densities.csv", header = TRUE, sep = ",", quote = "\"'", dec = ".",
+Field_Gas_Data <- read.table("path", header = TRUE, sep = ",", quote = "\"'", dec = ".",
                      fill = TRUE, comment.char = "", na.strings =  "?") # reads a file in table format and creates data frame 
 #from it named “Field_Gas_Data”
 View(Field_Gas_Data) # check the data is loaded correctly 
@@ -25,7 +25,6 @@ ncol(Field_Gas_Data) # check number of columns
 nrow(Field_Gas_Data) # check number of rows
 
 # Type conversion
-
 Field_Gas_Data$SITE_ID <- as.factor(Field_Gas_Data$SITE_ID) # encoding SITE_ID as a factor
 levels(Field_Gas_Data$SITE_ID) # display levels of the factor
 Field_Gas_Data$SITE_ID <- factor((Field_Gas_Data$SITE_ID), levels = c("CAN407", "CON186", "DIN431", "JOT403", "LAV410", "PIN414" ,"SEK430", "YOS404")) 
@@ -62,21 +61,20 @@ Field_Gas_Data$DATEON <- format(as.POSIXct(Field_Gas_Data$DATEON,
 Field_Gas <- Field_Gas_Data %>% mutate(DATEON = strftime(Field_Gas_Data$DATEON, "%m")) %>% rename(MONTH = DATEON) # re-formatting  DATEON with strftime() from 
 #lubridate package nto "%m" format and renaming it MONTH
 
-Field_Gas$MONTH <- as.factor(Field_Gas$MONTH) # coercion into 
-  #factor with 12 levels 
+Field_Gas$MONTH <- as.factor(Field_Gas$MONTH) # coercion into factor with 12 levels 
 MONTH <- Field_Gas$MONTH # assigning value to a name
- sapply(Field_Gas, class) # checking the data types of variables
+sapply(Field_Gas, class) # checking the data types of variables
 head(MONTH)
-#Data Cleaning: structure, check for missing values and for outliers
 
+# Data Cleaning: structure, check for missing values and for outliers
 str(Field_Gas) # data structure compact display
 sapply(Field_Gas, class) # high-order function returns vector as an output and it is a version of lapply()
 summary(Field_Gas) # summary statistics of "Field_Gas_Data"
 head(Field_Gas) # first 15 rows display
 typeof(Field_Gas) # determines what type of object is "Field_Gas_Data"
 class(Field_Gas) # check class of the object "Field_Gas_Data"
-#Checking for missing values
 
+# Checking for missing values
 any(is.na(Field_Gas)) # checking for missing values in a data table
 any(is.na(Field_Gas$NO3_CONC)) # checking for missing values in a variable
 any(is.na(Field_Gas$HNO3_CONC))# checking for missing values in a variable
@@ -91,10 +89,9 @@ length(Rows) # number of rows with missing values
 Columns <- sapply(Field_Gas, function(Field_Gas) sum(is.na(Field_Gas))) # number of missing values by column 
 print(Columns)
 sum(is.na(Field_Gas)) # adding up elements that are missing from Field_Gas_Data data table. 
-#Is.na () is a generic function that indicates which records are missing and sum() adds them together. 
+# Is.na () is a generic function that indicates which records are missing and sum() adds them together. 
 
-#Checking for outliers with ggboxplot
-
+# Checking for outliers with ggboxplot
 NitratePlot1 <- ggplot(data = Field_Gas) + aes(x= HNO3_CONC, y= NO3_CONC) + aes(color = YEAR) + geom_boxplot(outlier.size = 2,
   outlier.color = "red", outlier.shape = 4) + geom_jitter(width = 0.1, alpha = 0.05, color = "blue") # ggboxplot of NO3_CONC before filtration
 
@@ -132,7 +129,6 @@ print(NitratePlot3 + Nitrateplottheme3 + labs( title= "Distribution of Outliers 
 ggarrange(NitratePlot1, NitratePlot2, NitratePlot3, ncol = 3) # arranging two plots 
                                                                                   
 # Assessing Normality
-
 require(gridExtra)
 plot1 <- ggqqplot(Field_Gas_Data, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC") # ggqqplot before filtration 
 print(plot1) # print the plot
@@ -170,22 +166,21 @@ Field_Gas_Data_Filtered <- Field_Gas %>% filter(complete.cases(.)) %>% filter(NH
   filter(SO4_CONC < 1)
 dim(Field_Gas_Data_Filtered) # check the dimesnions after filtration of data frame
 
-#
-#Checking that the missing value have been filtered
-
+# Checking that the missing value have been filtered
 Rows <- unique(unlist(lapply(Field_Gas_Data_Filtered, function(Field_Gas_Data_Filtered) which(is.na(Field_Gas_Data_Filtered))))) # number of
 print(Rows)
 #missing values in Field_Gas_Data_Filtered
 sum(is.na(Field_Gas_Data_Filtered))
 Columns <- sapply(Field_Gas_Data_Filtered, function(Field_Gas_Data_Filtered) sum(is.na(Field_Gas_Data_Filtered))) # number of missing values by
-#column with Field_Gas_Data_Filtered after removal of NA’s values. The sapply () function output confirms
-#that the missing values are removed from the dataset.
+# column with Field_Gas_Data_Filtered after removal of NA’s values. The sapply () function output confirms
+# that the missing values are removed from the dataset.
 print(Columns)
 sapply(Field_Gas_Data_Filtered, class)
 print(Field_Gas_Data_Filtered$SITE_ID)
 levels(Field_Gas_Data_Filtered$SITE_ID)
 View(Field_Gas_Data_Filtered)
-#Side-by-side QQplots and box plots
+
+# Side-by-side QQplots and box plots
 require(gridExtra)
 plot1 <- ggqqplot(Field_Gas_Data, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC") 
 plot2 <- ggqqplot(Field_Gas_Data_Filtered, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC") 
@@ -200,43 +195,33 @@ plot4 <- ggplot(data = Field_Gas_Data_Filtered) + aes(x = HNO3_CONC, y = NO3_CON
 grid.arrange(plot3, plot4, ncol=2)
 
 
-# group base data summarization : 
+# Group base data summarization : 
 SITE_ID <- Field_Gas_Data_Filtered$SITE_ID
 YEAR <- Field_Gas_Data_Filtered$SITE_ID
 WEEK <- Field_Gas_Data_Filtered$WEEK
 MONTH <-Field_Gas_Data_Filtered$MONTH
+                             
 Field_Gas_Data_Trans <- Field_Gas_Data_Filtered %>%
   mutate(TNO3_CONC = NO3_CONC + HNO3_CONC) %>% mutate(TS_CONC = SO4_CONC + SO2_CONC) %>%
   mutate(INDEX = abs(TNO3_CONC - TS_CONC))
-View(Field_Gas_Data_Trans) 
 
-
-#Field_Gas_Data_Trans <- Field_Gas_Data_Filtered %>% 
- # select(SITE_ID, YEAR, WEEK, MONTH, SO2_CONC, SO4_CONC, NO3_CONC, HNO3_CONC, NH4_CONC) %>% 
- # mutate(TNO3_CONC = NO3_CONC + HNO3_CONC) %>% mutate(TS_CONC = SO4_CONC + SO2_CONC)
- #View(Field_Gas_Data_Trans) 
-  
   
 TS_CONC <- Field_Gas_Data_Trans$TS_CONC
 TNO3_CONC <- Field_Gas_Data_Trans$TNO3_CONC
 INDEX <- Field_Gas_Data_Trans$INDEX
+                             
 Field_Gas_Data_Final <-  Field_Gas_Data_Trans %>% group_by(YEAR, MONTH, WEEK) %>% 
   summarise(TS_CONC = mean(TS_CONC), TNO3_CONC = mean(TNO3_CONC), 
              NH4_CONC = mean(TNO3_CONC), INDEX = mean(INDEX))
 
-View(Field_Gas_Data_Final)
   
 dim(Field_Gas_Data_Final)
 hist(TNO3_CONC)
 hist(TS_CONC)
 hist(NH4_CONC)
 hist(INDEX)
-hist
 
-#Transformation
-
-
-
+# Transformation
 T_cub <- sign(x)*abs(x)^(1/3)
 Field_Gas_Data_Transformed <- Field_Gas_Data_Final %>% 
   transform(NH4_CONC = sign(NH4_CONC)*abs(NH4_CONC)^(1/3)) %>% 
@@ -244,23 +229,23 @@ Field_Gas_Data_Transformed <- Field_Gas_Data_Final %>%
   transform(TS_CONC = sign(TS_CONC)*abs(TS_CONC)^(1/3)) %>% 
   transform(INDEX = sign(INDEX)*abs(INDEX)^(1/3))
   
-View(Field_Gas_Data_Transformed)
 with(Field_Gas_Data_Transformed, shapiro.test(Field_Gas_Data_Transformed$TNO3_CONC)) # Shapiro-Wilk test for the “post” variable
-View(Field_Gas_Data_Transformed)
-3Q-Q pLota
+
+# Q-Q pLots
 plot1 <- ggqqplot(Field_Gas_Data, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC") 
 plot2 <- ggqqplot(Field_Gas_Data_Filtered, title = "NORMAL Q-Q PLOT", x = "NO3_CONC", color = c("#00AFBB"), y = "NO3_CONC")
 plot3 <- ggqqplot(Field_Gas_Data_Transformed, title = "NORMAL Q-Q PLOT", x = "TNO3_CONC", color = c("#00AFBB"), y = "TNO3_CONC")
 grid.arrange(plot1, plot2, plot3, ncol=3)
 
-Scatterplot with marginal histogram
+# Scatterplot with marginal histogram
 p <- ggplot(Field_Gas_Data_Transformed, aes(TNO3_CONC, TS_CONC, color = TNO3_CONC)) + geom_point( size = 2) + 
   geom_smooth(method=lm, se=FALSE, fullrange=TRUE, color='#2C3E50') + theme_classic()
 ggExtra::ggMarginal(p, type = "histogram", fill = c("lightgreen"), xparams = list(fill = "purple", bins=10))
 
-library(viridis)
+
 
 # LINES PLOT: Discrete color. use the argument discrete = TRUE need categorical data
+library(viridis)
 ggplot(Field_Gas_Data_Transformed, aes(TNO3_CONC, YEAR))+
   geom_point(aes(color = MONTH)) +
   geom_smooth(aes(color = YEAR, fill = YEAR), method = "lm") + 
@@ -274,8 +259,9 @@ ggplot(Field_Gas_Data_Transformed, aes(TS_CONC, YEAR))+
   scale_fill_viridis(discrete = TRUE) + ggtitle(lab = "Distribution of Total Sulphur Deposition (μg/m3), from 2011 - 2019")
 
 
-library(plotly)
+
 # Kernel Density
+library(plotly)
 p <- ggplot(Field_Gas_Data_Transformed, aes(x = TS_CONC) + 
   geom_density(aes(fill = YEAR), alpha = 0.5) + 
   ggtitle("Kernel Density estimates by group")
@@ -286,5 +272,8 @@ p <- ggplot(Field_Gas_Data_Transformed, aes(x = TS_CONC)) +
 
 p <- ggplotly(p)
 p
-#Pearson correlation coefficient
+            
+# Pearson correlation coefficient
 cor.test(TNO3_CONC, TS_CONC, method=c("pearson"))
+            
+            
